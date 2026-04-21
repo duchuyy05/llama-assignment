@@ -66,10 +66,29 @@ def apply_rotary_emb(
 
     # Then, combine these trigonometric values with the tensors query_real, query_imag,
     # key_real, and key_imag.
+    # RoPE quay theo tung cap chieu, vi vay head_dim phai la so chan.
+    assert head_dim % 2 == 0, "RoPE requires an even head dimension."
+    # Tao tan so goc cho tung cap (q_1, q_2), (q_3, q_4), ...
+    freq_seq = torch.arange(0, head_dim, 2, device=device, dtype=torch.float32)
+    inv_freq = theta ** (-freq_seq / head_dim)
+    # Moi vi tri trong cau se co mot goc quay rieng cho moi cap chieu.
+    positions = torch.arange(seqlen, device=device, dtype=torch.float32)
+    freqs = torch.outer(positions, inv_freq)
+    freqs_cis = torch.polar(torch.ones_like(freqs), freqs)
 
-    raise NotImplementedError
+    # Gom moi cap so thuc thanh mot so phuc de phep quay tro thanh phep nhan phuc.
+    query_complex = torch.complex(query_real, query_imag)
+    key_complex = torch.complex(key_real, key_imag)
+    freqs_cis = reshape_for_broadcast(freqs_cis, query_complex)
 
-    query_out = None
-    key_out = None
+    # Nhan voi e^{i.theta} de quay query/key theo vi tri.
+    query_rotated = query_complex * freqs_cis
+    key_rotated = key_complex * freqs_cis
+
+    # Tach lai thanh tensor thuc voi dung shape ban dau cua moi head.
+    query_out = torch.stack((query_rotated.real, query_rotated.imag), dim=-1).flatten(-2)
+    key_out = torch.stack((key_rotated.real, key_rotated.imag), dim=-1).flatten(-2)
+    query_out = query_out.type_as(query)
+    key_out = key_out.type_as(key)
     # Return the rotary position embeddings for the query and key tensors
     return query_out, key_out

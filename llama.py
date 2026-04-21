@@ -122,6 +122,7 @@ class Attention(nn.Module):
         '''
         batch_size, seqlen, _ = x.shape
 
+        # Chieu input x thanh query, key, value roi tach thanh tung head.
         query = self.compute_query(x)
         key = self.compute_key(x)
         value = self.compute_value(x)
@@ -129,25 +130,24 @@ class Attention(nn.Module):
         key = key.view(batch_size, seqlen, self.n_local_kv_heads, self.head_dim)
         value = value.view(batch_size, seqlen, self.n_local_kv_heads, self.head_dim)
 
-        # RoPE relative positional embeddings
+        # Gan thong tin vi tri tuong doi vao query va key bang RoPE.
         query, key = apply_rotary_emb(query, key, self.head_dim, self.max_seq_len)
 
-        # Grouped multiquery attention: expand out keys and values.
-        # Convert both to:
-        # (bs, seqlen, n_local_heads, head_dim)
+        # GQA: so query heads lon hon so key/value heads,
+        # nen lap lai key/value de khop voi so query heads.
         key = torch.repeat_interleave(key, dim=2, repeats=self.n_rep)
         value = torch.repeat_interleave(value, dim=2, repeats=self.n_rep)
 
-        # make heads into a batch dimension
+        # Dua truc head len truoc de ham attention tinh tren moi head de dang hon.
         query = query.transpose(1, 2)  # (bs, n_local_heads, seqlen, head_dim)
         key = key.transpose(1, 2)
         value = value.transpose(1, 2)
         output = self.compute_query_key_value_scores(query, key, value)
 
-        # restore time as batch dimension and concat heads
+        # Gop lai cac head thanh vector an co kich thuoc goc.
         output = output.transpose(1, 2).contiguous().view(batch_size, seqlen, -1)
 
-        # final projection into the residual stream
+        # Chieu ve residual stream de tra ra cho transformer block.
         output = self.resid_dropout(self.compute_output(output))
         return output
 

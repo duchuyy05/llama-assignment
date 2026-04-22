@@ -276,7 +276,9 @@ def test(args):
 	assert args.test_out.endswith("test-finetuning-output.txt"), 'For saving finetuning results, please set the test_out argument as "<dataset>-test-finetuning-output.txt"'
 	with torch.no_grad():
 		device = torch.device('cuda') if args.use_gpu else torch.device('cpu')
-		saved = torch.load(args.filepath)
+		# PyTorch >=2.6 defaults to weights_only=True, which breaks loading
+		# this checkpoint because it stores argparse.Namespace in metadata.
+		saved = torch.load(args.filepath, weights_only=False)
 		config = saved['model_config']
 		model = LlamaEmbeddingClassifier(config)
 		model.load_state_dict(saved['model'])

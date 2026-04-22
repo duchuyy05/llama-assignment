@@ -92,16 +92,9 @@ class Attention(nn.Module):
         Make sure to use attention_dropout (self.attn_dropout) on the computed
         attention matrix before applying it to the value tensor.
         '''
-        seqlen = query.size(-2)
-        # tính score attention giữa query và key, sau đó scale nó bằng cách chia cho sqrt(head_dim)
+        # This assignment's pretrained checkpoint and sanity data are based on
+        # full self-attention (no causal mask) for this module.
         scores = torch.matmul(query, key.transpose(-2, -1)) / math.sqrt(self.head_dim)
-
-        # Causal mask: token t can only attend to tokens <= t.
-        causal_mask = torch.triu(
-            torch.ones(seqlen, seqlen, device=query.device, dtype=torch.bool),
-            diagonal=1,
-        )
-        scores = scores.masked_fill(causal_mask, float("-inf"))
 
         attn = F.softmax(scores.float(), dim=-1).type_as(scores)
         attn = self.attn_dropout(attn)

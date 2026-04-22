@@ -7,7 +7,12 @@ TO DO IN THIS ASSIGNMENT:
 
 DETAIL:
 The code to implement can be found in llama.py, classifier.py and optimizer.py. You are reponsible for writing core components of Llama2 (one of the leading open source language models). 
-In doing so, you will gain a strong understanding of neural language modeling. We will load pretrained weights for your language model from stories42M.pt; an 8-layer, 42M parameter language model pretrained on the TinyStories dataset (a dataset of machine-generated children's stories). Download tại link:  https://www.cs.cmu.edu/~vijayv/stories42M.pt
+In doing so, you will gain a strong understanding of neural language modeling. We will load pretrained weights for your language model from stories42M.pt; an 8-layer, 42M parameter language model pretrained on the TinyStories dataset (a dataset of machine-generated children's stories).
+
+Model download links:
+- Original: https://www.cs.cmu.edu/~vijayv/stories42M.pt
+- Google Drive (team mirror): https://drive.google.com/file/d/YOUR_FILE_ID/view?usp=sharing
+
 This model is small enough that it can be trained (slowly) without a GPU. You are encouraged to use Colab or a personal GPU machine (e.g. a Macbook) to be able to iterate more quickly.
 
 Once you have implemented these components, you will test our your model in 3 settings:
@@ -82,4 +87,3 @@ GROUP_ID/
           ├── Group_ID-report.pdf
           
           └── setup.sh
-

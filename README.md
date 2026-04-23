@@ -1,89 +1,203 @@
-# ASSIGNMENT 1: 
-# DEVELOPMENT MINIMALIST OF THE LLAMA2 MODEL (core components of Llama2)
+# Assignment 1: Develop Minimalist of The Llama2
 
-TO DO IN THIS ASSIGNMENT:
-- Implement some important components of the Llama2 model to better understanding its architecture. 
-- Perform sentence classification on sst dataset and cfimdb dataset with this model.
+Triển khai một số thành phần cốt lõi của Llama2 để:
 
-DETAIL:
-The code to implement can be found in llama.py, classifier.py and optimizer.py. You are reponsible for writing core components of Llama2 (one of the leading open source language models). 
-In doing so, you will gain a strong understanding of neural language modeling. We will load pretrained weights for your language model from stories42M.pt; an 8-layer, 42M parameter language model pretrained on the TinyStories dataset (a dataset of machine-generated children's stories).
+- sinh văn bản từ mô hình ngôn ngữ pretrained,
+- phân loại cảm xúc bằng zero-shot prompting,
+- fine-tune mô hình cho bài toán sentiment classification trên `SST` và `CFIMDB`.
 
-Model download links:
-- Original: https://www.cs.cmu.edu/~vijayv/stories42M.pt
-- Google Drive (team mirror): https://drive.google.com/file/d/YOUR_FILE_ID/view?usp=sharing
+## Tổng quan
 
-This model is small enough that it can be trained (slowly) without a GPU. You are encouraged to use Colab or a personal GPU machine (e.g. a Macbook) to be able to iterate more quickly.
+Các phần được hiện thực trong project:
 
-Once you have implemented these components, you will test our your model in 3 settings:
-1.	Generate a text completion (starting with the sentence "I have wanted to see this thriller for a while, and it didn't disappoint. Keanu Reeves, playing the hero John Wick, is"). You should see coherent, grammatical English being generated (though the content and topicality of the completion may be absurd, since this LM was pretrained exclusively on children's stories).
-2.	Perform zero-shot, prompt-based sentiment analysis on two datasets (SST-5 and CFIMDB). This will give bad results (roughly equal to choosing a random target class).
-3.	Perform task-specific finetuning of your Llama2 model, after implementing a classification head in classifier.py. This will give much stronger classification results.
+- `RoPE` trong [rope.py]
+- `RMSNorm`, `Attention`, `Transformer block`, `generate()` trong [llama.py]
+- classifier head trong [classifier.py]
+- optimizer `AdamW` trong [optimizer.py]
 
-More detail in file pdf ASM
+Mô hình sử dụng checkpoint pretrained `stories42M.pt` để chạy inference và fine-tuning.
 
-#Submission
+Cấu trúc chính:
 
-Report: your zip file can include a pdf file, named Group_ID-report.pdf. Report can present implement the requirements, accuracy, best results are with some hyperparameters other than the default, how running your code... no more than 3 pages in 2 weeks.
-Canvas Submission
-For submission via Canvas, the submission file should be a zip file with the following structure:
+```text
+.
+├── data/
+│   ├── sst-*.txt
+│   ├── cfimdb-*.txt
+│   └── *-label-mapping.json
+├── run_llama.py
+├── llama.py
+├── rope.py
+├── classifier.py
+├── optimizer.py
+├── base_llama.py
+├── config.py
+├── tokenizer.py
+├── utils.py
+├── sanity_check.py
+├── rope_test.py
+├── optimizer_test.py
+├── structure.md
+├── setup.sh
+├── README.md
+├── generated-sentence-temp-0.txt
+├── generated-sentence-temp-1.txt
+├── sst-dev-prompting-output.txt
+├── sst-test-prompting-output.txt
+├── sst-dev-finetuning-output.txt
+├── sst-test-finetuning-output.txt
+├── cfimdb-dev-prompting-output.txt
+├── cfimdb-test-prompting-output.txt
+├── cfimdb-dev-finetuning-output.txt
+├── cfimdb-test-finetuning-output.txt
+└── *-advanced-output.txt
+```
 
-GROUP_ID/
+Dataset:
 
-          ├── run_llama.py
+- `SST`: 5 lớp cảm xúc, label names: `awful`, `bad`, `average`, `good`, `excellent`
+- `CFIMDB`: 2 lớp cảm xúc, label names: `bad`, `good`
 
-          ├── base_llama.py
+Số lượng mẫu hiện có trong repo:
 
-          ├── llama.py
+- `sst-train`: 8544
+- `sst-dev`: 1101
+- `sst-test`: 2210
+- `cfimdb-train`: 1707
+- `cfimdb-dev`: 245
+- `cfimdb-test`: 488
 
-          ├── rope.py
+## Cài đặt và chạy
 
-          ├── classifier.py
-          
-          ├── config.py
-          
-          ├── optimizer.py
-          
-          ├── sanity_check.py
-          
-          ├── tokenizer.py
-          
-          ├── utils.py
-          
-          ├── README.md
-          
-          ├── structure.md
-          
-          ├── sanity_check.data
-          
-          ├── generated-sentence-temp-0.txt
-          
-          ├── generated-sentence-temp-1.txt
-          
-          ├── [OPTIONAL] sst-dev-advanced-output.txt
-          
-          ├── [OPTIONAL] sst-test-advanced-output.txt
-          
-          ├── sst-dev-prompting-output.txt
-          
-          ├── sst-test-prompting-output.txt
-          
-          ├── sst-dev-finetuning-output.txt
-          
-          ├── sst-test-finetuning-output.txt
-          
-          ├── [OPTIONAL] cfimdb-dev-advanced-output.txt
-          
-          ├── [OPTIONAL] cfimdb-test-advanced-output.txt
-          
-          ├── cfimdb-dev-prompting-output.txt
-          
-          ├── cfimdb-test-prompting-output.txt
-          
-          ├── cfimdb-dev-finetuning-output.txt
-          
-          ├── cfimdb-test-finetuning-output.txt
-          
-          ├── Group_ID-report.pdf
-          
-          └── setup.sh
+Project cung cấp [setup.sh] để tạo môi trường và tải checkpoint
+```bash
+bash setup.sh
+```
+
+Script này sẽ:
+
+- tạo môi trường `conda` tên `llama_hw`,
+- cài `PyTorch`, `scikit-learn`, `sentencepiece`, `tokenizers`, ...
+- tải file `stories42M.pt`.
+
+Kiểm tra cài đặt:
+
+Chạy 3 bài test sau:
+
+```bash
+python rope_test.py
+python optimizer_test.py
+python sanity_check.py
+```
+
+Nếu mọi thứ đúng, bạn sẽ thấy:
+
+- `Rotary embedding test passed!`
+- `Optimizer test passed!`
+- `Your Llama implementation is correct!`
+
+### 1. Sinh văn bản
+
+```bash
+python run_llama.py --option generate
+```
+
+Lệnh này sẽ sinh 2 file:
+
+- `generated-sentence-temp-0.txt`
+- `generated-sentence-temp-1.txt`
+
+### 2. Zero-shot prompting
+
+SST:
+
+```bash
+python run_llama.py \
+  --option prompt \
+  --train data/sst-train.txt \
+  --dev data/sst-dev.txt \
+  --test data/sst-test.txt \
+  --label-names data/sst-label-mapping.json \
+  --dev_out sst-dev-prompting-output.txt \
+  --test_out sst-test-prompting-output.txt
+```
+
+CFIMDB:
+
+```bash
+python run_llama.py \
+  --option prompt \
+  --train data/cfimdb-train.txt \
+  --dev data/cfimdb-dev.txt \
+  --test data/cfimdb-test.txt \
+  --label-names data/cfimdb-label-mapping.json \
+  --dev_out cfimdb-dev-prompting-output.txt \
+  --test_out cfimdb-test-prompting-output.txt
+```
+
+### 3. Fine-tuning classifier
+
+SST:
+
+```bash
+python run_llama.py \
+  --option finetune \
+  --epochs 5 \
+  --lr 2e-5 \
+  --batch_size 80 \
+  --train data/sst-train.txt \
+  --dev data/sst-dev.txt \
+  --test data/sst-test.txt \
+  --label-names data/sst-label-mapping.json \
+  --dev_out sst-dev-finetuning-output.txt \
+  --test_out sst-test-finetuning-output.txt
+```
+
+CFIMDB:
+
+```bash
+python run_llama.py \
+  --option finetune \
+  --epochs 5 \
+  --lr 2e-5 \
+  --batch_size 10 \
+  --train data/cfimdb-train.txt \
+  --dev data/cfimdb-dev.txt \
+  --test data/cfimdb-test.txt \
+  --label-names data/cfimdb-label-mapping.json \
+  --dev_out cfimdb-dev-finetuning-output.txt \
+  --test_out cfimdb-test-finetuning-output.txt
+```
+
+Nếu có GPU:
+
+```bash
+python run_llama.py --option finetune --use_gpu
+```
+
+Các tham số chính:
+
+Một số cờ CLI đang có trong [run_llama.py]:
+
+- `--option`: `generate`, `prompt`, `finetune`
+- `--pretrained-model-path`: đường dẫn tới `stories42M.pt`
+- `--epochs`
+- `--lr`
+- `--batch_size`
+- `--use_gpu`
+- `--dev_out`, `--test_out`
+
+Checkpoint fine-tuned sẽ được lưu theo mẫu:
+
+```text
+{option}-{epochs}-{lr}.pt
+```
+
+Ví dụ: `finetune-5-2e-05.pt`
+
+## Output và ghi chú
+
+- Không dùng `transformers`; project chỉ dùng các thư viện được cài trong `setup.sh`.
+- `sanity_check.py` phụ thuộc trực tiếp vào checkpoint `stories42M.pt`.
+- Với bài toán zero-shot prompting, accuracy thường thấp hơn đáng kể so với fine-tuning.
+- Project đi kèm [LICENSE] theo giấy phép MIT.

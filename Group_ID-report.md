@@ -101,12 +101,14 @@ Accuracy của các file `advanced`:
 
 | Dataset | Tập | Advanced Accuracy |
 |---|---|---:|
-| SST | Dev | 0.4178 |
-| SST | Test | 0.4502 |
-| CFIMDB | Dev | 0.8980 |
+| SST | Dev | 0.4187 |
+| SST | Test | 0.4448 |
+| CFIMDB | Dev | 0.9184 |
 | CFIMDB | Test | 0.5020 |
 
-Ghi chú: trong bản hiện tại của thư mục nộp bài, 4 file `advanced` cho dự đoán trùng với file `finetuning` tương ứng nên accuracy trùng nhau.
+Ghi chú:
+- Nhóm dùng hướng `advanced` chạy nhanh: huấn luyện `TF-IDF + LinearSVM` trên tập train, sau đó confidence-based override dự đoán finetuning ở bước suy luận.
+- Mức độ thay đổi so với finetuning: SST đổi `229/1101` mẫu dev và `421/2210` mẫu test; CFIMDB đổi `17/245` mẫu dev và `36/488` mẫu test.
 
 ## 7. Thử siêu tham số khác mặc định
 

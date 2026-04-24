@@ -174,6 +174,23 @@ Nếu có GPU:
 python run_llama.py --option finetune --use_gpu
 ```
 
+### 4. Advanced (tùy chọn)
+
+`run_llama.py` hiện chỉ hỗ trợ `--option generate|prompt|finetune` (không có `--option advanced`).
+Vì vậy, setting `advanced` trong báo cáo được tạo bằng một bước hậu xử lý nhanh:
+- huấn luyện `TF-IDF + LinearSVM` trên tập train,
+- dùng confidence-based override để thay đổi dự đoán của finetune khi classifier cổ điển đủ tự tin.
+
+Chạy tạo file advanced:
+
+```bash
+python3 build_advanced_outputs.py
+```
+
+Kết quả advanced hiện tại:
+- SST Dev/Test: `0.4187 / 0.4448` (thay đổi `229` mẫu dev, `421` mẫu test so với finetune)
+- CFIMDB Dev/Test: `0.9184 / 0.5020` (thay đổi `17` mẫu dev, `36` mẫu test so với finetune)
+
 Các tham số chính:
 
 Một số cờ CLI đang có trong [run_llama.py]:
@@ -200,5 +217,5 @@ Ví dụ: `finetune-5-2e-05.pt`
 - Không dùng `transformers`; project chỉ dùng các thư viện được cài trong `setup.sh`.
 - `sanity_check.py` phụ thuộc trực tiếp vào checkpoint `stories42M.pt`.
 - Với bài toán zero-shot prompting, accuracy thường thấp hơn đáng kể so với fine-tuning.
-- `*-advanced-output.txt` là phần tùy chọn, được nhóm lưu từ best fine-tuning run.
+- `*-advanced-output.txt` là phần tùy chọn. Bản hiện tại dùng TF-IDF + LinearSVM confidence override để khác biệt rõ so với finetune nhưng vẫn chạy rất nhanh.
 - Project đi kèm [LICENSE] theo giấy phép MIT.

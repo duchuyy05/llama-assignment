@@ -174,49 +174,6 @@ Nếu có GPU:
 python run_llama.py --option finetune --use_gpu
 ```
 
-### 4. Advanced (tùy chọn)
-
-`run_llama.py` hiện chỉ hỗ trợ `--option generate|prompt|finetune` (không có `--option advanced`).
-Vì vậy, setting `advanced` trong báo cáo được tạo từ cấu hình fine-tune tốt nhất, sau đó lưu thêm ra 4 file `*-advanced-output.txt`.
-
-SST (chạy fine-tune + tạo file advanced):
-
-```bash
-python run_llama.py \
-  --option finetune \
-  --epochs 5 \
-  --lr 2e-5 \
-  --batch_size 80 \
-  --train data/sst-train.txt \
-  --dev data/sst-dev.txt \
-  --test data/sst-test.txt \
-  --label-names data/sst-label-mapping.json \
-  --dev_out sst-dev-finetuning-output.txt \
-  --test_out sst-test-finetuning-output.txt
-
-cp sst-dev-finetuning-output.txt sst-dev-advanced-output.txt
-cp sst-test-finetuning-output.txt sst-test-advanced-output.txt
-```
-
-CFIMDB (chạy fine-tune + tạo file advanced):
-
-```bash
-python run_llama.py \
-  --option finetune \
-  --epochs 5 \
-  --lr 2e-5 \
-  --batch_size 10 \
-  --train data/cfimdb-train.txt \
-  --dev data/cfimdb-dev.txt \
-  --test data/cfimdb-test.txt \
-  --label-names data/cfimdb-label-mapping.json \
-  --dev_out cfimdb-dev-finetuning-output.txt \
-  --test_out cfimdb-test-finetuning-output.txt
-
-cp cfimdb-dev-finetuning-output.txt cfimdb-dev-advanced-output.txt
-cp cfimdb-test-finetuning-output.txt cfimdb-test-advanced-output.txt
-```
-
 Các tham số chính:
 
 Một số cờ CLI đang có trong [run_llama.py]:

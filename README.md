@@ -177,7 +177,7 @@ python run_llama.py --option finetune --use_gpu
 ### 4. Advanced (tùy chọn)
 
 `run_llama.py` hiện chỉ hỗ trợ `--option generate|prompt|finetune` (không có `--option advanced`).
-Vì vậy, setting `advanced` trong báo cáo được tạo bằng một bước hậu xử lý nhanh:
+Vì vậy, setting `advanced` trong báo cáo được tạo bằng một bước hậu xử lý:
 - huấn luyện `TF-IDF + LinearSVM` trên tập train,
 - dùng confidence-based override để thay đổi dự đoán của finetune khi classifier cổ điển đủ tự tin.
 

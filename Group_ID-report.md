@@ -62,16 +62,9 @@ Kiểm thử xác thực trước thực nghiệm:
 - `python optimizer_test.py` để kiểm tra AdamW.
 - `python sanity_check.py` để kiểm tra tích hợp forward pass của Llama.
 
-## 3. Cách chạy code (reproducible)
+## 3. Cách chạy code
 
 Chi tiết cài đặt và toàn bộ lệnh chạy được trình bày trong file `README.md`, mục `Cài đặt và chạy`.
-
-Các file output được sử dụng để tổng hợp kết quả trong báo cáo:
-- `generated-sentence-temp-0.txt`, `generated-sentence-temp-1.txt`
-- `sst-dev-prompting-output.txt`, `sst-test-prompting-output.txt`
-- `sst-dev-finetuning-output.txt`, `sst-test-finetuning-output.txt`
-- `cfimdb-dev-prompting-output.txt`, `cfimdb-test-prompting-output.txt`
-- `cfimdb-dev-finetuning-output.txt`, `cfimdb-test-finetuning-output.txt`
 
 ## 4. Siêu tham số
 
@@ -84,7 +77,7 @@ Mô hình từ `config.py`: `vocab=32000`, `hidden=512`, `layers=8`, `heads=8`, 
 | Finetune CFIMDB | `epochs=5`, `lr=2e-5`, `batch_size=10`, `dropout=0.3`, `seed=1337` |
 | Generate | `max_new_tokens=75`, `temperature ∈ {0.0, 1.0}` |
 
-Thử thêm ngoài cấu hình chính: `epochs=1` cho CFIMDB (so sánh tại Mục 6).
+Thử thêm ngoài cấu hình chính: `epochs=1` cho CFIMDB (so sánh tại Mục 7).
 
 ## 5. Kết quả chính
 
@@ -102,7 +95,20 @@ Nhận xét:
 - Fine-tuning cải thiện đáng kể, rõ nhất ở CFIMDB dev.
 - Chế độ generate cho câu hợp ngữ pháp ở `temperature=0.0`; đa dạng hơn nhưng nhiễu hơn ở `temperature=1.0`.
 
-## 6. Thử siêu tham số khác mặc định
+## 6. Kết quả advanced (tùy chọn)
+
+Accuracy của các file `advanced`:
+
+| Dataset | Tập | Advanced Accuracy |
+|---|---|---:|
+| SST | Dev | 0.4178 |
+| SST | Test | 0.4502 |
+| CFIMDB | Dev | 0.8980 |
+| CFIMDB | Test | 0.5020 |
+
+Ghi chú: trong bản hiện tại của thư mục nộp bài, 4 file `advanced` cho dự đoán trùng với file `finetuning` tương ứng nên accuracy trùng nhau.
+
+## 7. Thử siêu tham số khác mặc định
 
 Nhóm có thử thay đổi số epoch cho CFIMDB (giữ nguyên `lr=2e-5`, `batch_size=10`, `dropout=0.3`):
 
@@ -113,6 +119,6 @@ Nhóm có thử thay đổi số epoch cho CFIMDB (giữ nguyên `lr=2e-5`, `bat
 
 Kết quả cho thấy tăng số epoch từ 1 lên 5 giúp cải thiện mạnh trên tập dev, vì vậy nhóm chọn `epochs=5` cho kết quả cuối cùng.
 
-## 7. Kết luận
+## 8. Kết luận
 
 Nhóm đã hoàn thiện đầy đủ các thành phần lõi và tái lập đúng pipeline của đề. Kết quả cho thấy zero-shot chỉ ở mức cơ bản, còn fine-tuning cải thiện rõ rệt trên cả SST và CFIMDB (đặc biệt ở dev). Cấu hình chốt: `epochs=5`, `lr=2e-5`, batch size theo từng dataset.

@@ -187,10 +187,6 @@ Chạy tạo file advanced:
 python3 build_advanced_outputs.py
 ```
 
-Kết quả advanced hiện tại:
-- SST Dev/Test: `0.4187 / 0.4448` (thay đổi `229` mẫu dev, `421` mẫu test so với finetune)
-- CFIMDB Dev/Test: `0.9184 / 0.5020` (thay đổi `17` mẫu dev, `36` mẫu test so với finetune)
-
 Các tham số chính:
 
 Một số cờ CLI đang có trong [run_llama.py]:

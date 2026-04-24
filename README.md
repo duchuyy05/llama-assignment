@@ -68,7 +68,6 @@ Số lượng mẫu hiện có trong repo:
 - `cfimdb-test`: 488
 
 ## Cài đặt và chạy
-
 Project cung cấp [setup.sh] để tạo môi trường và tải checkpoint
 ```bash
 bash setup.sh
@@ -195,6 +194,7 @@ Checkpoint fine-tuned sẽ được lưu theo mẫu:
 
 Ví dụ: `finetune-5-2e-05.pt`
 
+[Link các phiên bản model nhóm đã finetune](https://drive.google.com/drive/u/3/folders/1QZIJKa7WZN2N_3J655M5OGiPde6WZnV9)
 ## Output và ghi chú
 
 - Không dùng `transformers`; project chỉ dùng các thư viện được cài trong `setup.sh`.
